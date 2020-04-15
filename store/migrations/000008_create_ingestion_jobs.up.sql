@@ -1,0 +1,5 @@
+CREATE TABLE ingestion_jobs (
+    id         BIGSERIAL PRIMARY KEY,
+    started_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    ended_at   TIMESTAMP WITH TIME ZONE
+);

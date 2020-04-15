@@ -1,0 +1,255 @@
+swagger: "2.0"
+consumes:
+  - application/json
+produces:
+  - application/json
+schemes:
+  - http
+info:
+  title: DDRP Relayer
+  version: 0.1.0
+securityDefinitions:
+  key:
+    type: apiKey
+    in: header
+    name: X-API-Token
+paths:
+  /users:
+    post:
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/CreateUserParams'
+      responses:
+        '204':
+          description: User successfully created.
+        default:
+          description: Error creating user.
+          schema:
+            $ref: '#/definitions/Error'
+  /login:
+    post:
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/LoginParams'
+      responses:
+        '200':
+          description: Successfully logged in.
+          schema:
+            $ref: '#/definitions/TokenResponse'
+        '401':
+          description: Invalid username or password.
+
+  /posts:
+    post:
+      security:
+        - key: []
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/PostParams'
+      responses:
+        '200':
+          description: Post successfully created.
+          schema:
+            $ref: '#/definitions/PostResponse'
+        default:
+          description: Error creating post.
+          schema:
+            $ref: '#/definitions/Error'
+
+  /moderations:
+    post:
+      security:
+        - key: []
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/ModerationParams'
+      responses:
+        '200':
+          description: Moderation successfully created.
+          schema:
+            $ref: '#/definitions/ModerationResponse'
+        default:
+          description: Error creating moderation.
+          schema:
+            $ref: '#/definitions/Error'
+
+  /connections:
+    post:
+      security:
+        - key: []
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/ConnectionParams'
+      responses:
+        '200':
+          description: Connection successfully created.
+          schema:
+            $ref: '#/definitions/ConnectionResponse'
+        default:
+          description: Error creating connection.
+          schema:
+            $ref: '#/definitions/Error'
+
+  /tlds:
+    get:
+      parameters:
+        - name: start
+          in: query
+          type: string
+      responses:
+        '200':
+          description: List of TLDs.
+          schema:
+            $ref: '#/definitions/TLDResponse'
+
+definitions:
+  CreateUserParams:
+    type: object
+    properties:
+      username:
+        type: string
+      tld:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+  LoginParams:
+    type: object
+    properties:
+      username:
+        type: string
+      tld:
+        type: string
+      password:
+        type: string
+  TokenResponse:
+    type: object
+    properties:
+      token:
+        type: string
+      expiry:
+        type: number
+  PostParams:
+    type: object
+    properties:
+      title:
+        type: string
+      body:
+        type: string
+      reference:
+        type: string
+      topic:
+        type: string
+      tags:
+        type: array
+        items:
+          type: string
+  PostResponse:
+    type: object
+    properties:
+      id:
+        type: number
+      guid:
+        type: string
+      refhash:
+        type: string
+      username:
+        type: string
+      tld:
+        type: string
+      timestamp:
+        type: number
+      reference:
+        type: string
+      body:
+        type: string
+      topic:
+        type: string
+      tags:
+        type: array
+        items:
+          type: string
+  ModerationParams:
+    type: object
+    properties:
+      reference:
+        type: string
+      type:
+        type: string
+  ModerationResponse:
+    type: object
+    properties:
+      id:
+        type: number
+      guid:
+        type: string
+      refhash:
+        type: string
+      username:
+        type: string
+      tld:
+        type: string
+      timestamp:
+        type: number
+      reference:
+        type: string
+      type:
+        type: string
+  ConnectionParams:
+    type: object
+    properties:
+      connectee_tld:
+        type: string
+      connectee_subdomain:
+        type: string
+      type:
+        type: string
+  ConnectionResponse:
+    type: object
+    properties:
+      id:
+        type: number
+      guid:
+        type: string
+      refhash:
+        type: string
+      username:
+        type: string
+      tld:
+        type: string
+      timestamp:
+        type: number
+      connectee_tld:
+        type: string
+      connectee_subdomain:
+        type: string
+      type:
+        type: string
+  TLDResponse:
+    type: object
+    properties:
+      tlds:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            partitions_available:
+              type: number
+  Error:
+    type: object
+    properties:
+      message:
+        type: string

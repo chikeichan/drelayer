@@ -1,0 +1,4 @@
+CREATE TABLE tlds (
+    id   BIGSERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL UNIQUE
+);

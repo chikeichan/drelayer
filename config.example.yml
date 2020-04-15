@@ -1,0 +1,23 @@
+ddrp:
+  address: 127.0.0.1:9098
+
+database:
+  debug: true
+  name: ddrp_relayer_development
+  username: username
+  host: localhost
+  sslmode: disable
+
+server:
+  port: 8080
+  servicekey: "servicekey"
+
+session:
+  secret: foobar
+
+tlds:
+  - name: your-tld-here.
+    privatekey: somehex
+
+featureflags:
+  allowsignup: true
