@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/btcsuite/btcd v0.20.1-beta
-	github.com/ddrp-org/dformats v1.5.0
+	github.com/ddrp-org/dformats v1.6.0
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/go-openapi/errors v0.19.2
 	github.com/go-openapi/strfmt v0.19.3
