@@ -100,6 +100,9 @@ func FormatTLD(querier store.Querier, tld string) (io.ReadCloser, error) {
 	if err := tmp.Truncate(protocol.BlobSize); err != nil {
 		return nil, errors.Wrap(err, wrapMsg)
 	}
+	if _, err := tmp.Write([]byte(dformats.SubdomainMagic)); err != nil {
+		return nil, errors.Wrap(err, wrapMsg)
+	}
 	for _, sub := range subdomains {
 		record := &dformats.SubdomainRecord{
 			Name:  sub.Username,
