@@ -113,6 +113,9 @@ func FormatTLD(querier store.Querier, tld string) (io.ReadCloser, error) {
 		}
 		logger.Info("formatted subdomain record", "subdomain", sub.Username)
 	}
+	if _, err := tmp.Seek(dformats.EndReservedDataOffset, io.SeekStart); err != nil {
+		return nil, errors.Wrap(err, wrapMsg)
+	}
 	for _, sub := range subdomains {
 		if err := writeSubdomain(querier, tmp, sub); err != nil {
 			return nil, errors.Wrap(err, wrapMsg)
@@ -129,10 +132,6 @@ func FormatTLD(querier store.Querier, tld string) (io.ReadCloser, error) {
 
 func writeSubdomain(querier store.Querier, tmp *os.File, sub *Subdomain) error {
 	wrapMsg := "error formatting subdomain"
-	off := int64(dformats.EndSubdomainRecordsOffset*2 + (MaxDataPerSubdomain * int(sub.Index)))
-	if _, err := tmp.Seek(off, io.SeekStart); err != nil {
-		return errors.Wrap(err, wrapMsg)
-	}
 	stream, err := StreamMessageManifestsForUserID(querier, sub.UserID)
 	if err != nil {
 		return errors.Wrap(err, wrapMsg)
@@ -158,7 +157,7 @@ func writeSubdomain(querier store.Querier, tmp *os.File, sub *Subdomain) error {
 		if err != nil {
 			return errors.Wrap(err, wrapMsg)
 		}
-		if err := formattable.EnvelopeFormat().Encode(buf); err != nil {
+		if err := dformats.EncodeEnvelope(buf, formattable.EnvelopeFormat()); err != nil {
 			return errors.Wrap(err, wrapMsg)
 		}
 		if written+buf.Len() > MaxDataPerSubdomain {

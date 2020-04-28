@@ -3,6 +3,7 @@ package main
 import (
 	"ddrp-relayer/config"
 	"ddrp-relayer/export"
+	"ddrp-relayer/healthcheck"
 	"ddrp-relayer/log"
 	"ddrp-relayer/protocol"
 	"ddrp-relayer/social"
@@ -66,6 +67,7 @@ func main() {
 		lgr.Info("public signup disabled, service key required")
 	}
 
+	hcService := &healthcheck.Service{}
 	userService := &user.Service{
 		DB:          db,
 		AllowSignup: cfg.FeatureFlags.AllowSignup,
@@ -83,6 +85,7 @@ func main() {
 	serverLogger := log.WithModule("web")
 	r := mux.NewRouter()
 	r.Use(web.RequestIDMW(), web.LoggingMW())
+	hcService.Mount(r)
 	userService.Mount(r)
 	socialService.Mount(r)
 	exportService.Mount(r)
