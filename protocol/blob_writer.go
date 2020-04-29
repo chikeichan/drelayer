@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"context"
+	apiv1 "ddrp-relayer/protocol/v1"
 	"github.com/pkg/errors"
 	"io"
 	"time"
@@ -13,16 +14,16 @@ const (
 )
 
 type BlobWriter struct {
-	Client      DDRPClient
+	Client      apiv1.DDRPv1Client
 	Signer      Signer
 	Name        string
 	Truncate    bool
-	writeClient DDRP_WriteClient
+	writeClient apiv1.DDRPv1_WriteClient
 	txID        uint32
 	offset      int
 }
 
-func NewBlobWriter(client DDRPClient, signer Signer, name string) *BlobWriter {
+func NewBlobWriter(client apiv1.DDRPv1Client, signer Signer, name string) *BlobWriter {
 	return &BlobWriter{
 		Client: client,
 		Signer: signer,
@@ -61,7 +62,7 @@ func (b *BlobWriter) WriteAt(p []byte, off int64) (int, error) {
 		toWrite = BlobWriterMaxChunkSize
 	}
 
-	err := b.writeClient.Send(&WriteReq{
+	err := b.writeClient.Send(&apiv1.WriteReq{
 		TxID:   b.txID,
 		Offset: uint32(off),
 		Data:   p[:toWrite],
@@ -82,7 +83,7 @@ func (b *BlobWriter) CommitAndClose(broadcast bool) error {
 	}
 	b.writeClient = nil
 	ctx := context.Background()
-	precommitRes, err := b.Client.PreCommit(ctx, &PreCommitReq{
+	precommitRes, err := b.Client.PreCommit(ctx, &apiv1.PreCommitReq{
 		TxID: b.txID,
 	})
 	if err != nil {
@@ -95,7 +96,7 @@ func (b *BlobWriter) CommitAndClose(broadcast bool) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to sign commitment")
 	}
-	_, err = b.Client.Commit(ctx, &CommitReq{
+	_, err = b.Client.Commit(ctx, &apiv1.CommitReq{
 		TxID:      b.txID,
 		Timestamp: uint64(ts.Unix()),
 		Signature: sig[:],
@@ -113,7 +114,7 @@ func (b *BlobWriter) createWriteClient() error {
 	}
 
 	ctx := context.Background()
-	checkoutRes, err := b.Client.Checkout(ctx, &CheckoutReq{
+	checkoutRes, err := b.Client.Checkout(ctx, &apiv1.CheckoutReq{
 		Name: b.Name,
 	})
 	if err != nil {
@@ -121,7 +122,7 @@ func (b *BlobWriter) createWriteClient() error {
 	}
 
 	if b.Truncate {
-		_, err = b.Client.Truncate(ctx, &TruncateReq{
+		_, err = b.Client.Truncate(ctx, &apiv1.TruncateReq{
 			TxID: checkoutRes.TxID,
 		})
 		if err != nil {

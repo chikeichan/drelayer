@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"ddrp-relayer/log"
 	"ddrp-relayer/protocol"
+	apiv1 "ddrp-relayer/protocol/v1"
 	"ddrp-relayer/social"
 	"ddrp-relayer/store"
 	"ddrp-relayer/tlds"
@@ -23,7 +24,7 @@ const (
 
 var logger = log.WithModule("export")
 
-func ExportTLDs(db *sql.DB, client protocol.DDRPClient, signer protocol.Signer) error {
+func ExportTLDs(db *sql.DB, client apiv1.DDRPv1Client, signer protocol.Signer) error {
 	wrapMsg := "error exporting tld"
 	var started bool
 	err := store.WithTransaction(db, func(tx *sql.Tx) error {
@@ -69,7 +70,7 @@ func ExportTLDs(db *sql.DB, client protocol.DDRPClient, signer protocol.Signer) 
 	return nil
 }
 
-func WriteTLD(querier store.Querier, client protocol.DDRPClient, signer protocol.Signer, tld string) error {
+func WriteTLD(querier store.Querier, client apiv1.DDRPv1Client, signer protocol.Signer, tld string) error {
 	wrapMsg := "error writing TLD"
 	f, err := FormatTLD(querier, tld)
 	if err != nil {
