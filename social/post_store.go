@@ -3,6 +3,7 @@ package social
 import (
 	"database/sql"
 	"ddrp-relayer/store"
+
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 )
@@ -45,7 +46,7 @@ RETURNING id
 
 func GetPostByID(querier store.Querier, id int) (*Post, error) {
 	query := `
-SELECT p.id, u.username, t.name, e.created_at, e.guid, e.refhash, p.body, p.title, p.reference, p.topic, p.tags
+SELECT p.id, u.username, t.name, e.created_at, e.id, e.refhash, p.body, p.title, p.reference, p.topic, p.tags
 FROM posts p
 JOIN envelopes e on p.envelope_id = e.id
 JOIN users u on e.user_id = u.id
@@ -67,7 +68,7 @@ func scanPost(row *sql.Row) (*Post, error) {
 		&post.Username,
 		&post.TLD,
 		&post.CreatedAt,
-		&post.GUID,
+		&post.ID,
 		&post.Refhash,
 		&post.Body,
 		&post.Title,

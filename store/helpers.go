@@ -2,6 +2,7 @@ package store
 
 import (
 	"database/sql"
+
 	"github.com/pkg/errors"
 )
 

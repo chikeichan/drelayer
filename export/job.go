@@ -5,17 +5,21 @@ import (
 	"database/sql"
 	"ddrp-relayer/log"
 	"ddrp-relayer/protocol"
-	apiv1 "ddrp-relayer/protocol/v1"
 	"ddrp-relayer/social"
 	"ddrp-relayer/store"
 	"ddrp-relayer/tlds"
 	"fmt"
-	"github.com/ddrp-org/dformats"
-	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"os"
 	"time"
+
+	"github.com/ddrp-org/ddrp/blob"
+	apiv1 "github.com/ddrp-org/ddrp/rpc/v1"
+
+	"github.com/ddrp-org/ddrp/rpc"
+	"github.com/ddrp-org/dformats"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -24,7 +28,7 @@ const (
 
 var logger = log.WithModule("export")
 
-func ExportTLDs(db *sql.DB, client apiv1.DDRPv1Client, signer protocol.Signer) error {
+func ExportTLDs(db *sql.DB, client apiv1.DDRPv1Client, signer *protocol.NameSigner) error {
 	wrapMsg := "error exporting tld"
 	var started bool
 	err := store.WithTransaction(db, func(tx *sql.Tx) error {
@@ -70,7 +74,7 @@ func ExportTLDs(db *sql.DB, client apiv1.DDRPv1Client, signer protocol.Signer) e
 	return nil
 }
 
-func WriteTLD(querier store.Querier, client apiv1.DDRPv1Client, signer protocol.Signer, tld string) error {
+func WriteTLD(querier store.Querier, client apiv1.DDRPv1Client, signer *protocol.NameSigner, tld string) error {
 	wrapMsg := "error writing TLD"
 	f, err := FormatTLD(querier, tld)
 	if err != nil {
@@ -78,11 +82,17 @@ func WriteTLD(querier store.Querier, client apiv1.DDRPv1Client, signer protocol.
 	}
 	defer f.Close()
 
-	bw := protocol.NewBlobWriter(client, signer, tld)
-	if _, err := io.CopyN(bw, f, protocol.BlobSize); err != nil {
+	bw := rpc.NewBlobWriter(client, signer.SingleSigner(tld), tld)
+	if err := bw.Open(); err != nil {
 		return errors.Wrap(err, wrapMsg)
 	}
-	if err := bw.CommitAndClose(true); err != nil {
+	if err := bw.Truncate(); err != nil {
+		return errors.Wrap(err, wrapMsg)
+	}
+	if _, err := io.CopyN(bw, f, blob.Size); err != nil {
+		return errors.Wrap(err, wrapMsg)
+	}
+	if err := bw.Commit(true); err != nil {
 		return errors.Wrap(err, wrapMsg)
 	}
 	return nil
@@ -98,7 +108,7 @@ func FormatTLD(querier store.Querier, tld string) (io.ReadCloser, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, wrapMsg)
 	}
-	if err := tmp.Truncate(protocol.BlobSize); err != nil {
+	if err := tmp.Truncate(blob.Size); err != nil {
 		return nil, errors.Wrap(err, wrapMsg)
 	}
 	if _, err := tmp.Write([]byte(dformats.SubdomainMagic)); err != nil {

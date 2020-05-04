@@ -3,16 +3,17 @@ package export
 import (
 	"database/sql"
 	"ddrp-relayer/protocol"
-	apiv1 "ddrp-relayer/protocol/v1"
 	"ddrp-relayer/user"
-	"github.com/gorilla/mux"
+	apiv1 "github.com/ddrp-org/ddrp/rpc/v1"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type Service struct {
 	DB         *sql.DB
 	Client     apiv1.DDRPv1Client
-	Signer     protocol.Signer
+	Signer     *protocol.NameSigner
 	ServiceKey string
 }
 

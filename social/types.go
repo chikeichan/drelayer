@@ -2,8 +2,9 @@ package social
 
 import (
 	"encoding/hex"
-	"github.com/ddrp-org/dformats"
 	"time"
+
+	"github.com/ddrp-org/dformats"
 )
 
 type EnvelopeFormatter interface {
@@ -14,7 +15,7 @@ type Envelope struct {
 	Username  string
 	TLD       string
 	CreatedAt time.Time
-	GUID      string
+	ID        int
 	Refhash   string
 }
 
@@ -43,7 +44,7 @@ func (p *Post) EnvelopeFormat() *dformats.Envelope {
 	msg.Tags = p.Tags
 	return &dformats.Envelope{
 		Timestamp: p.CreatedAt,
-		GUID:      mustConvertGUID(p.GUID),
+		ID:        uint32(p.ID),
 		Message:   msg,
 	}
 }
@@ -72,7 +73,7 @@ func (c *Connection) EnvelopeFormat() *dformats.Envelope {
 	}
 	return &dformats.Envelope{
 		Timestamp: c.CreatedAt,
-		GUID:      mustConvertGUID(c.GUID),
+		ID:        uint32(c.ID),
 		Message:   msg,
 	}
 }
@@ -97,22 +98,9 @@ func (m *Moderation) EnvelopeFormat() *dformats.Envelope {
 	msg.Reference = mustConvertHash(m.Reference)
 	return &dformats.Envelope{
 		Timestamp: m.CreatedAt,
-		GUID:      mustConvertGUID(m.GUID),
+		ID:        uint32(m.ID),
 		Message:   msg,
 	}
-}
-
-func mustConvertGUID(in string) [8]byte {
-	if len(in) != 16 {
-		panic("invalid guid")
-	}
-	buf, err := hex.DecodeString(in)
-	if err != nil {
-		panic(err)
-	}
-	var out [8]byte
-	copy(out[:], buf)
-	return out
 }
 
 func mustConvertHash(in string) [32]byte {

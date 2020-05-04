@@ -3,6 +3,7 @@ package social
 import (
 	"database/sql"
 	"ddrp-relayer/store"
+
 	"github.com/pkg/errors"
 )
 
@@ -21,7 +22,7 @@ func CreatePin(tx *sql.Tx, userID int, reference string) (*Moderation, error) {
 
 func GetModerationByID(querier store.Querier, id int) (*Moderation, error) {
 	query := `
-SELECT m.id, u.username, t.name, e.created_at, e.guid, e.refhash, m.reference, m.moderation_type
+SELECT m.id, u.username, t.name, e.created_at, e.id, e.refhash, m.reference, m.moderation_type
 FROM moderations m
 JOIN envelopes e ON m.envelope_id = e.id
 JOIN users u ON e.user_id = u.id
@@ -73,7 +74,7 @@ func scanModeration(row *sql.Row) (*Moderation, error) {
 		&moderation.Username,
 		&moderation.TLD,
 		&moderation.CreatedAt,
-		&moderation.GUID,
+		&moderation.ID,
 		&moderation.Refhash,
 		&moderation.Reference,
 		&moderation.Type,

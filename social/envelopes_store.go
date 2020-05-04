@@ -4,26 +4,22 @@ import (
 	"database/sql"
 	"ddrp-relayer/user"
 	"encoding/hex"
+
 	"github.com/ddrp-org/dformats"
 	"github.com/pkg/errors"
 )
 
 func CreateEnvelope(tx *sql.Tx, userID int) (int, error) {
 	query := `
-INSERT INTO envelopes(user_id, guid)
-VALUES($1, $2)
+INSERT INTO envelopes(user_id, network_id)
+VALUES($1, (SELECT COALESCE(MAX(network_id), 0) + 1 FROM envelopes e WHERE e.user_id = $1))
 RETURNING id
 `
 	var id int
-	if err := tx.QueryRow(query, userID, hexGuid()).Scan(&id); err != nil {
+	if err := tx.QueryRow(query, userID).Scan(&id); err != nil {
 		return 0, errors.Wrap(err, "error creating envelope")
 	}
 	return id, nil
-}
-
-func hexGuid() string {
-	data := dformats.NewGUID()
-	return hex.EncodeToString(data[:])
 }
 
 func SetEnvelopeRefhash(tx *sql.Tx, userID int, envelopeID int, envelope *dformats.Envelope) (string, error) {

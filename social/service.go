@@ -6,9 +6,10 @@ import (
 	"ddrp-relayer/store"
 	"ddrp-relayer/user"
 	"ddrp-relayer/web"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-	"net/http"
 )
 
 type Service struct {
@@ -50,7 +51,7 @@ func (s *Service) CreatePost(w http.ResponseWriter, r *http.Request) {
 
 	web.WriteJSON(w, r, &restmodels.PostResponse{
 		Body:      post.Body,
-		GUID:      post.GUID,
+		NetworkID: float64(post.ID),
 		ID:        float64(post.ID),
 		Reference: store.NilOrString(post.Reference),
 		Refhash:   post.Refhash,
@@ -101,7 +102,7 @@ func (s *Service) CreateConnection(w http.ResponseWriter, r *http.Request) {
 	web.WriteJSON(w, r, &restmodels.ConnectionResponse{
 		ConnecteeSubdomain: store.NilOrString(conn.ConnecteeSubdomain),
 		ConnecteeTld:       conn.ConnecteeTLD,
-		GUID:               conn.GUID,
+		NetworkID:          float64(conn.ID),
 		ID:                 float64(conn.ID),
 		Refhash:            conn.Refhash,
 		Timestamp:          float64(conn.CreatedAt.Unix()),
@@ -148,7 +149,7 @@ func (s *Service) CreateModeration(w http.ResponseWriter, r *http.Request) {
 	}
 
 	web.WriteJSON(w, r, &restmodels.ModerationResponse{
-		GUID:      mod.GUID,
+		NetworkID: float64(mod.ID),
 		ID:        float64(mod.ID),
 		Reference: mod.Reference,
 		Refhash:   mod.Refhash,

@@ -42,7 +42,7 @@ func ValidateConnectionParams(params *restmodels.ConnectionParams) error {
 	if params.ConnecteeSubdomain != "" && len(params.ConnecteeSubdomain) > 15 {
 		return errors.New("connectee subdomain must be less than 15 characters")
 	}
-	if params.Type != "FOLLOW" &&params.Type != "BLOCK" {
+	if params.Type != "FOLLOW" && params.Type != "BLOCK" {
 		return errors.New("type must be either FOLLOW or BLOCK")
 	}
 	return nil

@@ -13,15 +13,16 @@ import (
 	"ddrp-relayer/version"
 	"ddrp-relayer/web"
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/jinzhu/configor"
-	_ "github.com/lib/pq"
-	"github.com/pkg/errors"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/gorilla/mux"
+	"github.com/jinzhu/configor"
+	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
 )
 
 func main() {

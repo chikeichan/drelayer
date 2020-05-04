@@ -3,6 +3,7 @@ package social
 import (
 	"database/sql"
 	"ddrp-relayer/store"
+
 	"github.com/pkg/errors"
 )
 
@@ -21,7 +22,7 @@ func CreateBlock(tx *sql.Tx, userID int, username string, tld string) (*Connecti
 
 func GetConnectionByID(querier store.Querier, id int) (*Connection, error) {
 	query := `
-SELECT c.id, u.username, t.name, e.created_at, e.guid, e.refhash, c.tld, c.subdomain, c.connection_type
+SELECT c.id, u.username, t.name, e.created_at, e.id, e.refhash, c.tld, c.subdomain, c.connection_type
 FROM connections c
 JOIN envelopes e on c.envelope_id = e.id
 JOIN users u on e.user_id = u.id
@@ -73,7 +74,7 @@ func scanConnection(row *sql.Row) (*Connection, error) {
 		&connection.Username,
 		&connection.TLD,
 		&connection.CreatedAt,
-		&connection.GUID,
+		&connection.ID,
 		&connection.Refhash,
 		&connection.ConnecteeTLD,
 		&connection.ConnecteeSubdomain,

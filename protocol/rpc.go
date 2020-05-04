@@ -2,7 +2,9 @@ package protocol
 
 import (
 	"context"
-	apiv1 "ddrp-relayer/protocol/v1"
+
+	apiv1 "github.com/ddrp-org/ddrp/rpc/v1"
+
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 )

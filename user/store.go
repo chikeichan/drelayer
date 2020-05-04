@@ -5,10 +5,11 @@ import (
 	"database/sql"
 	"ddrp-relayer/store"
 	"encoding/hex"
-	"github.com/pkg/errors"
-	"golang.org/x/crypto/bcrypt"
 	"io"
 	"time"
+
+	"github.com/pkg/errors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (

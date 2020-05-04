@@ -5,10 +5,11 @@ import (
 	"crypto/rand"
 	"ddrp-relayer/log"
 	"encoding/hex"
-	"github.com/gorilla/mux"
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 var serverLogger = log.WithModule("server")

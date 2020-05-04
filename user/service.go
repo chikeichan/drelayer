@@ -5,12 +5,13 @@ import (
 	"ddrp-relayer/restmodels"
 	"ddrp-relayer/store"
 	"ddrp-relayer/web"
+	"net/http"
+	"time"
+
 	"github.com/go-redis/redis/v7"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
-	"net/http"
-	"time"
 )
 
 type Service struct {

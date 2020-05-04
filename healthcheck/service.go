@@ -1,11 +1,12 @@
 package healthcheck
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
-type Service struct {}
+type Service struct{}
 
 func (s *Service) Mount(r *mux.Router) {
 	r.HandleFunc("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
